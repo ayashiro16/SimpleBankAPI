@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using ISavableCollection = SimpleBankAPI.Interfaces.ISavableCollection;
-using AccountModel = SimpleBankAPI.Models.AccountModel;
+using SimpleBankAPI.Models;
+using SimpleBankAPI.Interfaces;
 
 namespace SimpleBankAPI.Controllers
 {
@@ -9,10 +9,12 @@ namespace SimpleBankAPI.Controllers
     public class AccountController : ControllerBase
     {
         private readonly ISavableCollection _context;
+        private readonly IAccountUtils _account;
         
-        public AccountController(ISavableCollection context)
+        public AccountController(ISavableCollection context, IAccountUtils account)
         {
             _context = context;
+            _account = account;
         }
         
         /// <summary>
@@ -24,7 +26,14 @@ namespace SimpleBankAPI.Controllers
         public async Task<ActionResult<AccountModel>> GetAccount(Guid id)
         {
             var account = await _context.FindAsync(id);
-            return account is null ?  NotFound() : account;
+            if (account is null)
+            {
+                return NotFound();
+            }
+            else
+            {
+                return account;
+            }
         }
         
         /// <summary>
@@ -35,15 +44,15 @@ namespace SimpleBankAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<AccountModel>> PostNewAccount([FromBody] CreateAccountRequest request)
         {
-            var newAccount = new AccountModel()
+            try
             {
-                Name = request.Name, 
-                Balance = 0, 
-                Id = Guid.NewGuid()
-            };
-            _context.Add(newAccount);
-            await _context.SaveChangesAsync();
-            return newAccount;
+                var account = await _account.CreateAccount(request.Name);
+                return account;
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
         }
 
         /// <summary>
@@ -55,12 +64,20 @@ namespace SimpleBankAPI.Controllers
         [HttpPost("{id:Guid}/deposits")]
         public async Task<ActionResult<AccountModel>> PostDepositFunds(Guid id, [FromBody] GetAmountRequest request)
         {
-            var account = await _context.FindAsync(id);
-            if (account is null || request.Amount < 0)
-                return BadRequest();
-            account.Balance += request.Amount;
-            await _context.SaveChangesAsync();
-            return account;
+            try
+            {
+                var account = await _account.DepositFunds(id, request.Amount);
+                if (account is null)
+                {
+                    return NotFound();
+                }
+                
+                return account;
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
         }
         
         /// <summary>
@@ -72,12 +89,20 @@ namespace SimpleBankAPI.Controllers
         [HttpPost("{id:Guid}/withdrawals")]
         public async Task<ActionResult<AccountModel>> PostWithdrawFunds(Guid id, [FromBody] GetAmountRequest request)
         {
-            var account = await _context.FindAsync(id);
-            if (account is null || account.Balance < request.Amount || request.Amount < 0)
-                return BadRequest();
-            account.Balance -= request.Amount;
-            await _context.SaveChangesAsync();
-            return account;
+            try
+            {
+                var account = await _account.WithdrawFunds(id, request.Amount);
+                if (account is null)
+                {
+                    return NotFound();
+                }
+
+                return account;
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
         }
 
         /// <summary>
@@ -86,16 +111,27 @@ namespace SimpleBankAPI.Controllers
         /// <param name="request">Request form that contains two Guid account IDs, "SenderId" and "RecipientId", and a decimal field "Amount"</param>
         /// <returns>ActionResult with Sender and Recipient AccountModels</returns>
         [HttpPost("transfers")]
-        public async Task<ActionResult<List<AccountModel>>> PostTransferFunds([FromBody] TransferFundsRequest request)
+        public async Task<ActionResult<TransferResponseModel>> PostTransferFunds([FromBody] TransferFundsRequest request)
         {
-            var sender = await _context.FindAsync(request.SenderId);
-            var recipient = await _context.FindAsync(request.RecipientId);
-            if (sender is null || recipient is null || sender.Balance < request.Amount || request.Amount < 0)
-                return BadRequest();
-            sender.Balance -= request.Amount;
-            recipient.Balance += request.Amount;
-            await _context.SaveChangesAsync();
-            return new List<AccountModel>(){sender, recipient};
+            try
+            {
+                var accounts = await _account.TransferFunds(request.SenderId, request.RecipientId, request.Amount);
+                if (accounts.Sender is null)
+                {
+                    return NotFound("Sender account could not be found");
+                }
+
+                if (accounts.Recipient is null)
+                {
+                    return NotFound("Recipient account could not be found");
+                }
+
+                return accounts;
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
         }
     }
 }
