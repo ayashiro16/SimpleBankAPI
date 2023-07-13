@@ -1,5 +1,3 @@
-using Microsoft.AspNetCore.Mvc;
-
 namespace SimpleBankAPI.Requests;
 
 public class GetAmountRequest
