@@ -1,5 +1,3 @@
-using BindProperties = Microsoft.AspNetCore.Mvc.BindPropertiesAttribute;
-
 namespace SimpleBankAPI.Requests;
 
 public class TransferFundsRequest
