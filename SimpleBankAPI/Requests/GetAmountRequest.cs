@@ -1,8 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 
-namespace SimpleBankAPI;
+namespace SimpleBankAPI.Requests;
 
-[BindProperties]
 public class GetAmountRequest
 {
     public decimal Amount { get; set; }

@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using SimpleBankAPI.Models;
 using SimpleBankAPI.Interfaces;
+using SimpleBankAPI.Requests;
 
 namespace SimpleBankAPI.Controllers
 {

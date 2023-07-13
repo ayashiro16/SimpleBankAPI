@@ -1,8 +1,7 @@
 using BindProperties = Microsoft.AspNetCore.Mvc.BindPropertiesAttribute;
 
-namespace SimpleBankAPI;
+namespace SimpleBankAPI.Requests;
 
-[BindProperties]
 public class TransferFundsRequest
 {
     public Guid SenderId { get; set; }
