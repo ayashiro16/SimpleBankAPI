@@ -1,7 +1,11 @@
 using AccountContext = SimpleBankAPI.AccountContext;
 using Microsoft.EntityFrameworkCore;
+using SimpleBankAPI.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
+
+var services = builder.Services;
+services.AddSingleton<ISavableCollection, AccountContext>();
 
 builder.Services.AddControllers();
 builder.Services.AddDbContext<AccountContext>(opt =>

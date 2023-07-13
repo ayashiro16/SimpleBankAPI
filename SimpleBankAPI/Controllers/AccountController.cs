@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using SimpleBankAPI.Models;
+using ISavableCollection = SimpleBankAPI.Interfaces.ISavableCollection;
+using AccountModel = SimpleBankAPI.Models.AccountModel;
 
 namespace SimpleBankAPI.Controllers
 {
@@ -7,9 +8,9 @@ namespace SimpleBankAPI.Controllers
     [ApiController]
     public class AccountController : ControllerBase
     {
-        private readonly AccountContext _context;
+        private readonly ISavableCollection _context;
         
-        public AccountController(AccountContext context)
+        public AccountController(ISavableCollection context)
         {
             _context = context;
         }
@@ -22,7 +23,7 @@ namespace SimpleBankAPI.Controllers
         [HttpGet("{id:Guid}")]
         public async Task<ActionResult<AccountModel>> GetAccount(Guid id)
         {
-            var account = await _context.Accounts.FindAsync(id);
+            var account = await _context.FindAsync(id);
             return account is null ?  NotFound() : account;
         }
         
@@ -40,7 +41,7 @@ namespace SimpleBankAPI.Controllers
                 Balance = 0, 
                 Id = Guid.NewGuid()
             };
-            _context.Accounts.Add(newAccount);
+            _context.Add(newAccount);
             await _context.SaveChangesAsync();
             return newAccount;
         }
@@ -54,7 +55,7 @@ namespace SimpleBankAPI.Controllers
         [HttpPost("{id:Guid}/deposits")]
         public async Task<ActionResult<AccountModel>> PostDepositFunds(Guid id, [FromBody] GetAmountRequest request)
         {
-            var account = await _context.Accounts.FindAsync(id);
+            var account = await _context.FindAsync(id);
             if (account is null || request.Amount < 0)
                 return BadRequest();
             account.Balance += request.Amount;
@@ -71,7 +72,7 @@ namespace SimpleBankAPI.Controllers
         [HttpPost("{id:Guid}/withdrawals")]
         public async Task<ActionResult<AccountModel>> PostWithdrawFunds(Guid id, [FromBody] GetAmountRequest request)
         {
-            var account = await _context.Accounts.FindAsync(id);
+            var account = await _context.FindAsync(id);
             if (account is null || account.Balance < request.Amount || request.Amount < 0)
                 return BadRequest();
             account.Balance -= request.Amount;
@@ -87,8 +88,8 @@ namespace SimpleBankAPI.Controllers
         [HttpPost("transfers")]
         public async Task<ActionResult<List<AccountModel>>> PostTransferFunds([FromBody] TransferFundsRequest request)
         {
-            var sender = await _context.Accounts.FindAsync(request.SenderId);
-            var recipient = await _context.Accounts.FindAsync(request.RecipientId);
+            var sender = await _context.FindAsync(request.SenderId);
+            var recipient = await _context.FindAsync(request.RecipientId);
             if (sender is null || recipient is null || sender.Balance < request.Amount || request.Amount < 0)
                 return BadRequest();
             sender.Balance -= request.Amount;

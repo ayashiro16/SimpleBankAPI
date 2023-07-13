@@ -6,4 +6,5 @@ public interface ISavableCollection
 {
     void Add(AccountModel account);
     ValueTask<AccountModel?> FindAsync(Guid id);
+    Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }
