@@ -13,7 +13,12 @@ public class AccountUtils: IAccountUtils
         _context = context;
     }
     
-
+    /// <summary>
+    /// Create and store an account with the provided name
+    /// </summary>
+    /// <param name="name">The account holder's name</param>
+    /// <returns>The account details of our newly created account</returns>
+    /// <exception cref="ArgumentException"></exception>
     public async Task<AccountModel> CreateAccount(string name)
     {
         if (string.IsNullOrEmpty(name) || string.IsNullOrWhiteSpace(name))
@@ -35,7 +40,14 @@ public class AccountUtils: IAccountUtils
 
         return account;
     }
-
+    
+    /// <summary>
+    /// Deposits funds to an account
+    /// </summary>
+    /// <param name="id">The account ID</param>
+    /// <param name="amount">The amount to be deposited</param>
+    /// <returns>The account details following the deposit</returns>
+    /// <exception cref="ArgumentOutOfRangeException"></exception>
     public async Task<AccountModel?> DepositFunds(Guid id, decimal amount)
     {
         if (amount < 0)
@@ -53,6 +65,14 @@ public class AccountUtils: IAccountUtils
         return account;
     }
 
+    /// <summary>
+    /// Withdraws funds from an account
+    /// </summary>
+    /// <param name="id">The account ID</param>
+    /// <param name="amount">The amount to be withdrawn</param>
+    /// <returns>The account details following the withdraw</returns>
+    /// <exception cref="ArgumentOutOfRangeException"></exception>
+    /// <exception cref="InvalidOperationException"></exception>
     public async Task<AccountModel?> WithdrawFunds(Guid id, decimal amount)
     {
         if (amount < 0)
@@ -74,6 +94,15 @@ public class AccountUtils: IAccountUtils
         return account;
     }
 
+    /// <summary>
+    /// Transfers funds from sender to recipient
+    /// </summary>
+    /// <param name="senderId">The account ID of the sender</param>
+    /// <param name="recipientId">The account ID of the recipient</param>
+    /// <param name="amount">The amount to be transferred</param>
+    /// <returns>The account details of both the sender and the recipient following the transfer</returns>
+    /// <exception cref="ArgumentOutOfRangeException"></exception>
+    /// <exception cref="InvalidOperationException"></exception>
     public async Task<TransferResponseModel> TransferFunds(Guid senderId, Guid recipientId, decimal amount)
     {
         if (amount < 0)

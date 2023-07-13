@@ -20,8 +20,8 @@ namespace SimpleBankAPI.Controllers
         /// <summary>
         /// Retrieves account from database
         /// </summary>
-        /// <param name="id">The Guid account ID</param>
-        /// <returns>ActionResult with AccountModel</returns>
+        /// <param name="id">The account ID</param>
+        /// <returns>The account associated with the provided ID</returns>
         [HttpGet("{id:Guid}")]
         public async Task<ActionResult<AccountModel>> GetAccount(Guid id)
         {
@@ -30,17 +30,15 @@ namespace SimpleBankAPI.Controllers
             {
                 return NotFound();
             }
-            else
-            {
-                return account;
-            }
+            
+            return account;
         }
         
         /// <summary>
-        /// Creates new account and adds it to the database
+        /// Create and store a new account with the provided user's name
         /// </summary>
-        /// <param name="request">Request form that contains string field "Name"</param>
-        /// <returns>ActionResult with AccountModel</returns>
+        /// <param name="request">The string "Name" of the account holder</param>
+        /// <returns>The account details of the newly created account</returns>
         [HttpPost]
         public async Task<ActionResult<AccountModel>> PostNewAccount([FromBody] CreateAccountRequest request)
         {
@@ -58,9 +56,9 @@ namespace SimpleBankAPI.Controllers
         /// <summary>
         /// Creates deposit to add funds to an account
         /// </summary>
-        /// <param name="id">The Guid account ID</param>
-        /// <param name="request">Request form that contains decimal field "Amount"</param>
-        /// <returns>ActionResult with AccountModel</returns>
+        /// <param name="id">The account ID</param>
+        /// <param name="request">The decimal "Amount" to be withdrawn</param>
+        /// <returns>The account details of the account following the deposit</returns>
         [HttpPost("{id:Guid}/deposits")]
         public async Task<ActionResult<AccountModel>> PostDepositFunds(Guid id, [FromBody] GetAmountRequest request)
         {
@@ -83,9 +81,9 @@ namespace SimpleBankAPI.Controllers
         /// <summary>
         /// Creates withdrawal to take from an account
         /// </summary>
-        /// <param name="id">The Guid account ID</param>
-        /// <param name="request">Request form that contains the decimal field "Amount"</param>
-        /// <returns>ActionResult with AccountModel</returns>
+        /// <param name="id">The account ID</param>
+        /// <param name="request">The decimal "Amount" to be withdrawn</param>
+        /// <returns>The account details of the account following the withdrawal</returns>
         [HttpPost("{id:Guid}/withdrawals")]
         public async Task<ActionResult<AccountModel>> PostWithdrawFunds(Guid id, [FromBody] GetAmountRequest request)
         {
@@ -108,8 +106,8 @@ namespace SimpleBankAPI.Controllers
         /// <summary>
         /// Creates a transfer that takes funds from sender account and deposits to receiver account
         /// </summary>
-        /// <param name="request">Request form that contains two Guid account IDs, "SenderId" and "RecipientId", and a decimal field "Amount"</param>
-        /// <returns>ActionResult with Sender and Recipient AccountModels</returns>
+        /// <param name="request">Sender's account ID: "SenderId", Recipient's account ID: "RecipientId", and decimal "Amount" to be transferred</param>
+        /// <returns>The account details of both the sender and the recipient following the transfer</returns>
         [HttpPost("transfers")]
         public async Task<ActionResult<TransferResponseModel>> PostTransferFunds([FromBody] TransferFundsRequest request)
         {
