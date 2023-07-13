@@ -13,13 +13,17 @@ public class AccountUtils: IAccountUtils
         _context = context;
     }
     
+
     public async Task<AccountModel> CreateAccount(string name)
     {
-        if (string.IsNullOrEmpty(name) || string.IsNullOrWhiteSpace((name)))
+        if (string.IsNullOrEmpty(name) || string.IsNullOrWhiteSpace(name))
         {
             throw new ArgumentException("Name field cannot be empty or white space");
         }
-        
+        if (!name.All(x => char.IsWhiteSpace(x) || char.IsLetter(x)))
+        {
+            throw new ArgumentException("Name cannot contain special characters or numbers");
+        }
         var account = new AccountModel()
         {
             Name = name, 
@@ -82,7 +86,6 @@ public class AccountUtils: IAccountUtils
         {
             return new TransferResponseModel(sender, recipient);
         }
-
         if (sender.Balance < amount)
         {
             throw new InvalidOperationException("Insufficient funds");
