@@ -1,18 +1,19 @@
 using AccountContext = SimpleBankAPI.AccountContext;
 using Microsoft.EntityFrameworkCore;
 using SimpleBankAPI.Interfaces;
+using SimpleBankAPI.Utils;
 
 var builder = WebApplication.CreateBuilder(args);
 
 var services = builder.Services;
-services.AddSingleton<ISavableCollection, AccountContext>();
 
-builder.Services.AddControllers();
-builder.Services.AddDbContext<AccountContext>(opt =>
+services.AddControllers();
+services.AddDbContext<AccountContext>(opt =>
     opt.UseInMemoryDatabase("Accounts"));
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-
+services.AddEndpointsApiExplorer();
+services.AddSwaggerGen();
+services.AddTransient<ISavableCollection, AccountContext>();
+services.AddTransient<IAccountUtils, AccountUtils>();
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
