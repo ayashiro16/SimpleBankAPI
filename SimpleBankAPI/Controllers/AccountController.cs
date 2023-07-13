@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using SimpleBankAPI.Models;
 
 namespace SimpleBankAPI.Controllers
@@ -15,7 +14,23 @@ namespace SimpleBankAPI.Controllers
             _context = context;
         }
         
-        // POST: api/Account
+        /// <summary>
+        /// Retrieves account from database
+        /// </summary>
+        /// <param name="id">The Guid account ID</param>
+        /// <returns>ActionResult with AccountModel</returns>
+        [HttpGet("{id:Guid}")]
+        public async Task<ActionResult<AccountModel>> GetAccount(Guid id)
+        {
+            var account = await _context.Accounts.FindAsync(id);
+            return account is null ?  NotFound() : account;
+        }
+        
+        /// <summary>
+        /// Creates new account and adds it to the database
+        /// </summary>
+        /// <param name="request">Request form that contains string field "Name"</param>
+        /// <returns>ActionResult with AccountModel</returns>
         [HttpPost]
         public async Task<ActionResult<AccountModel>> PostNewAccount([FromBody] CreateAccountRequest request)
         {
@@ -30,19 +45,16 @@ namespace SimpleBankAPI.Controllers
             return newAccount;
         }
 
-        // GET: api/Account/5
-        [HttpGet("{id:Guid}")]
-        public async Task<ActionResult<AccountModel>> GetAccount(Guid id)
-        {
-            var account = await _context.Accounts.FindAsync(id);
-            return account is null ?  NotFound() : account;
-        }
-
-        // POST: api/Account/5/deposits
+        /// <summary>
+        /// Creates deposit to add funds to an account
+        /// </summary>
+        /// <param name="id">The Guid account ID</param>
+        /// <param name="request">Request form that contains decimal field "Amount"</param>
+        /// <returns>ActionResult with AccountModel</returns>
         [HttpPost("{id:Guid}/deposits")]
         public async Task<ActionResult<AccountModel>> PostDepositFunds(Guid id, [FromBody] GetAmountRequest request)
         {
-            var account = await _context.Accounts.SingleOrDefaultAsync(x => x.Id == id);
+            var account = await _context.Accounts.FindAsync(id);
             if (account is null || request.Amount < 0)
                 return BadRequest();
             account.Balance += request.Amount;
@@ -50,11 +62,16 @@ namespace SimpleBankAPI.Controllers
             return account;
         }
         
-        // POST: api/Account/5/withdrawals
+        /// <summary>
+        /// Creates withdrawal to take from an account
+        /// </summary>
+        /// <param name="id">The Guid account ID</param>
+        /// <param name="request">Request form that contains the decimal field "Amount"</param>
+        /// <returns>ActionResult with AccountModel</returns>
         [HttpPost("{id:Guid}/withdrawals")]
         public async Task<ActionResult<AccountModel>> PostWithdrawFunds(Guid id, [FromBody] GetAmountRequest request)
         {
-            var account = await _context.Accounts.SingleOrDefaultAsync(x => x.Id == id);
+            var account = await _context.Accounts.FindAsync(id);
             if (account is null || account.Balance < request.Amount || request.Amount < 0)
                 return BadRequest();
             account.Balance -= request.Amount;
@@ -62,12 +79,16 @@ namespace SimpleBankAPI.Controllers
             return account;
         }
 
-        // POST: api/Account/transfers
+        /// <summary>
+        /// Creates a transfer that takes funds from sender account and deposits to receiver account
+        /// </summary>
+        /// <param name="request">Request form that contains two Guid account IDs, "SenderId" and "RecipientId", and a decimal field "Amount"</param>
+        /// <returns>ActionResult with Sender and Recipient AccountModels</returns>
         [HttpPost("transfers")]
         public async Task<ActionResult<List<AccountModel>>> PostTransferFunds([FromBody] TransferFundsRequest request)
         {
-            var sender = await _context.Accounts.SingleOrDefaultAsync(x => x.Id == request.SenderId);
-            var recipient = await _context.Accounts.SingleOrDefaultAsync(x => x.Id == request.RecipientId);
+            var sender = await _context.Accounts.FindAsync(request.SenderId);
+            var recipient = await _context.Accounts.FindAsync(request.RecipientId);
             if (sender is null || recipient is null || sender.Balance < request.Amount || request.Amount < 0)
                 return BadRequest();
             sender.Balance -= request.Amount;
