@@ -10,9 +10,9 @@ namespace SimpleBankAPI.Controllers
     public class AccountController : ControllerBase
     {
         private readonly ISavableCollection _context;
-        private readonly IAccountUtils _account;
+        private readonly IAccountServices _account;
         
-        public AccountController(ISavableCollection context, IAccountUtils account)
+        public AccountController(ISavableCollection context, IAccountServices account)
         {
             _context = context;
             _account = account;
