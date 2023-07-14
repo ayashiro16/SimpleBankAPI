@@ -1,4 +1,4 @@
-using AccountContext = SimpleBankAPI.AccountContext;
+using AccountContext = SimpleBankAPI.Data.AccountContext;
 using Microsoft.EntityFrameworkCore;
 using SimpleBankAPI.Interfaces;
 using SimpleBankAPI.Utils;
