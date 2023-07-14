@@ -1,14 +1,13 @@
+using SimpleBankAPI.Interfaces;
 using SimpleBankAPI.Models;
-using IAccountUtils = SimpleBankAPI.Interfaces.IAccountUtils;
-using ISavableCollection = SimpleBankAPI.Interfaces.ISavableCollection;
 
-namespace SimpleBankAPI.Utils;
+namespace SimpleBankAPI.Services;
 
-public class AccountUtils: IAccountUtils
+public class AccountServices: IAccountServices
 {
     private readonly ISavableCollection _context;
     
-    public AccountUtils(ISavableCollection context)
+    public AccountServices(ISavableCollection context)
     {
         _context = context;
     }

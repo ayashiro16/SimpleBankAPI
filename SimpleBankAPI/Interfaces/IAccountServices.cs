@@ -2,7 +2,7 @@ using SimpleBankAPI.Models;
 
 namespace SimpleBankAPI.Interfaces;
 
-public interface IAccountUtils
+public interface IAccountServices
 {
     Task<AccountModel> CreateAccount(string name);
     Task<AccountModel?> DepositFunds(Guid id, decimal amount);
