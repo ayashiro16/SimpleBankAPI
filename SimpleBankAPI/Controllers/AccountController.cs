@@ -115,11 +115,14 @@ namespace SimpleBankAPI.Controllers
             try
             {
                 var accounts = await _account.TransferFunds(request.SenderId, request.RecipientId, request.Amount);
+                if (accounts.Sender is null && accounts.Recipient is null)
+                {
+                    return NotFound("Sender and recipient accounts could not be found");
+                }
                 if (accounts.Sender is null)
                 {
                     return NotFound("Sender account could not be found");
                 }
-
                 if (accounts.Recipient is null)
                 {
                     return NotFound("Recipient account could not be found");
