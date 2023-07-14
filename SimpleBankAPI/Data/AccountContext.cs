@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using AccountModel = SimpleBankAPI.Models.AccountModel;
 using ISavableCollection = SimpleBankAPI.Interfaces.ISavableCollection;
 
-namespace SimpleBankAPI;
+namespace SimpleBankAPI.Data;
 
 public class AccountContext : DbContext, ISavableCollection
 {
