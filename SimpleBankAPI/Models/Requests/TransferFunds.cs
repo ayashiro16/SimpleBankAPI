@@ -1,6 +1,6 @@
-namespace SimpleBankAPI.Requests;
+namespace SimpleBankAPI.Models.Requests;
 
-public class TransferFundsRequest
+public class TransferFunds
 {
     public Guid SenderId { get; set; }
     public Guid RecipientId { get; set; }

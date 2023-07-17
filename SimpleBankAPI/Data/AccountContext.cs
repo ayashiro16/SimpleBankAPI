@@ -1,16 +1,16 @@
 using Microsoft.EntityFrameworkCore;
-using AccountModel = SimpleBankAPI.Models.AccountModel;
+using Account = SimpleBankAPI.Models.Entities.Account;
 using ISavableCollection = SimpleBankAPI.Interfaces.ISavableCollection;
 
 namespace SimpleBankAPI.Data;
 
 public class AccountContext : DbContext, ISavableCollection
 {
-    public DbSet<AccountModel> Accounts { private get; init; }
+    public DbSet<Account> Accounts { private get; init; }
     
     public AccountContext(DbContextOptions<AccountContext> options) : base(options) {}
 
-    public void Add(AccountModel account) => Accounts.Add(account);
+    public void Add(Account account) => Accounts.Add(account);
 
-    public ValueTask<AccountModel?> FindAsync(Guid id) => Accounts.FindAsync(id);
+    public ValueTask<Account?> FindAsync(Guid id) => Accounts.FindAsync(id);
 }

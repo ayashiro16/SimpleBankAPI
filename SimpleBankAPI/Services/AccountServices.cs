@@ -1,5 +1,6 @@
 using SimpleBankAPI.Interfaces;
-using SimpleBankAPI.Models;
+using SimpleBankAPI.Models.Responses;
+using Account = SimpleBankAPI.Models.Entities.Account;
 
 namespace SimpleBankAPI.Services;
 
@@ -18,7 +19,7 @@ public class AccountServices: IAccountServices
     /// <param name="name">The account holder's name</param>
     /// <returns>The account details of our newly created account</returns>
     /// <exception cref="ArgumentException"></exception>
-    public async Task<AccountModel> CreateAccount(string name)
+    public async Task<Account> CreateAccount(string name)
     {
         if (string.IsNullOrEmpty(name) || string.IsNullOrWhiteSpace(name))
         {
@@ -28,7 +29,7 @@ public class AccountServices: IAccountServices
         {
             throw new ArgumentException("Name cannot contain special characters or numbers");
         }
-        var account = new AccountModel()
+        var account = new Account()
         {
             Name = name, 
             Balance = 0, 
@@ -45,7 +46,7 @@ public class AccountServices: IAccountServices
     /// </summary>
     /// <param name="id">The account Id</param>
     /// <returns>The account details</returns>
-    public ValueTask<AccountModel?> FindAccount(Guid id) => _context.FindAsync(id);
+    public ValueTask<Account?> FindAccount(Guid id) => _context.FindAsync(id);
     
     /// <summary>
     /// Deposits funds to an account
@@ -54,7 +55,7 @@ public class AccountServices: IAccountServices
     /// <param name="amount">The amount to be deposited</param>
     /// <returns>The account details following the deposit</returns>
     /// <exception cref="ArgumentOutOfRangeException"></exception>
-    public async Task<AccountModel?> DepositFunds(Guid id, decimal amount)
+    public async Task<Account?> DepositFunds(Guid id, decimal amount)
     {
         if (amount < 0)
         {
@@ -79,7 +80,7 @@ public class AccountServices: IAccountServices
     /// <returns>The account details following the withdraw</returns>
     /// <exception cref="ArgumentOutOfRangeException"></exception>
     /// <exception cref="InvalidOperationException"></exception>
-    public async Task<AccountModel?> WithdrawFunds(Guid id, decimal amount)
+    public async Task<Account?> WithdrawFunds(Guid id, decimal amount)
     {
         if (amount < 0)
         {
@@ -109,7 +110,7 @@ public class AccountServices: IAccountServices
     /// <returns>The account details of both the sender and the recipient following the transfer</returns>
     /// <exception cref="ArgumentOutOfRangeException"></exception>
     /// <exception cref="InvalidOperationException"></exception>
-    public async Task<TransferResponseModel> TransferFunds(Guid senderId, Guid recipientId, decimal amount)
+    public async Task<Transfer> TransferFunds(Guid senderId, Guid recipientId, decimal amount)
     {
         if (amount < 0)
         {
@@ -119,7 +120,7 @@ public class AccountServices: IAccountServices
         var recipient = await _context.FindAsync(recipientId);
         if (sender is null || recipient is null)
         {
-            return new TransferResponseModel(sender, recipient);
+            return new Transfer(sender, recipient);
         }
         if (sender.Balance < amount)
         {
@@ -129,6 +130,6 @@ public class AccountServices: IAccountServices
         recipient.Balance += amount;
         await _context.SaveChangesAsync();
         
-        return new TransferResponseModel(sender, recipient);
+        return new Transfer(sender, recipient);
     }
 }
