@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using NuGet.Protocol.Plugins;
 using SimpleBankAPI.Models;
 using SimpleBankAPI.Requests;
 using IAccountServices = SimpleBankAPI.Interfaces.IAccountServices;
@@ -46,9 +47,13 @@ namespace SimpleBankAPI.Controllers
                 var account = await _account.CreateAccount(request.Name);
                 return account;
             }
-            catch (Exception e)
+            catch (ArgumentException e)
             {
                 return BadRequest(e.Message);
+            }
+            catch (Exception e)
+            {
+                throw e;
             }
         }
 
@@ -68,12 +73,16 @@ namespace SimpleBankAPI.Controllers
                 {
                     return NotFound();
                 }
-                
+
                 return account;
+            }
+            catch (ArgumentOutOfRangeException e)
+            {
+                return BadRequest(e.Message);
             }
             catch (Exception e)
             {
-                return BadRequest(e.Message);
+                throw e;
             }
         }
         
@@ -96,9 +105,17 @@ namespace SimpleBankAPI.Controllers
 
                 return account;
             }
-            catch (Exception e)
+            catch (ArgumentOutOfRangeException e)
             {
                 return BadRequest(e.Message);
+            }
+            catch (InvalidOperationException e)
+            {
+                return BadRequest(e.Message);
+            }
+            catch (Exception e)
+            {
+                throw e;
             }
         }
 
@@ -113,24 +130,25 @@ namespace SimpleBankAPI.Controllers
             try
             {
                 var accounts = await _account.TransferFunds(request.SenderId, request.RecipientId, request.Amount);
-                if (accounts.Sender is null && accounts.Recipient is null)
+                return accounts switch
                 {
-                    return NotFound("Sender and recipient accounts could not be found");
-                }
-                if (accounts.Sender is null)
-                {
-                    return NotFound("Sender account could not be found");
-                }
-                if (accounts.Recipient is null)
-                {
-                    return NotFound("Recipient account could not be found");
-                }
-
-                return accounts;
+                    { Sender: null, Recipient: null } => NotFound("Sender and recipient accounts could not be found"),
+                    { Sender: null, Recipient: not null } => NotFound("Sender account could not be found"),
+                    { Sender: not null, Recipient: null } => NotFound("Recipient account could not be found"),
+                    _ => accounts
+                };
+            }
+            catch (ArgumentOutOfRangeException e)
+            {
+                return BadRequest(e.Message);
+            }
+            catch (InvalidOperationException e)
+            {
+                return BadRequest(e.Message);
             }
             catch (Exception e)
             {
-                return BadRequest(e.Message);
+                throw e;
             }
         }
     }
