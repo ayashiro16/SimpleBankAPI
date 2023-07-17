@@ -39,6 +39,13 @@ public class AccountServices: IAccountServices
 
         return account;
     }
+
+    /// <summary>
+    /// Retrieves the account associated with the given ID
+    /// </summary>
+    /// <param name="id">The account Id</param>
+    /// <returns>The account details</returns>
+    public ValueTask<AccountModel?> FindAccount(Guid id) => _context.FindAsync(id);
     
     /// <summary>
     /// Deposits funds to an account
