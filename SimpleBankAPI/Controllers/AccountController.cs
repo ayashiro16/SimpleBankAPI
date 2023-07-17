@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
-using NuGet.Protocol.Plugins;
-using SimpleBankAPI.Models;
-using SimpleBankAPI.Requests;
+using SimpleBankAPI.Models.Requests;
+using SimpleBankAPI.Models.Responses;
+using Account = SimpleBankAPI.Models.Entities.Account;
 using IAccountServices = SimpleBankAPI.Interfaces.IAccountServices;
 
 namespace SimpleBankAPI.Controllers
@@ -23,7 +23,7 @@ namespace SimpleBankAPI.Controllers
         /// <param name="id">The account ID</param>
         /// <returns>The account associated with the provided ID</returns>
         [HttpGet("{id:Guid}")]
-        public async Task<ActionResult<AccountModel>> GetAccount(Guid id)
+        public async Task<ActionResult<Account>> GetAccount(Guid id)
         {
             var account = await _account.FindAccount(id);
             if (account is null)
@@ -40,7 +40,7 @@ namespace SimpleBankAPI.Controllers
         /// <param name="request">The string "Name" of the account holder</param>
         /// <returns>The account details of the newly created account</returns>
         [HttpPost]
-        public async Task<ActionResult<AccountModel>> PostNewAccount([FromBody] CreateAccountRequest request)
+        public async Task<ActionResult<Account>> PostNewAccount([FromBody] CreateAccount request)
         {
             try
             {
@@ -64,7 +64,7 @@ namespace SimpleBankAPI.Controllers
         /// <param name="request">The decimal "Amount" to be withdrawn</param>
         /// <returns>The account details of the account following the deposit</returns>
         [HttpPost("{id:Guid}/deposits")]
-        public async Task<ActionResult<AccountModel>> PostDepositFunds(Guid id, [FromBody] GetAmountRequest request)
+        public async Task<ActionResult<Account>> PostDepositFunds(Guid id, [FromBody] GetAmount request)
         {
             try
             {
@@ -93,7 +93,7 @@ namespace SimpleBankAPI.Controllers
         /// <param name="request">The decimal "Amount" to be withdrawn</param>
         /// <returns>The account details of the account following the withdrawal</returns>
         [HttpPost("{id:Guid}/withdrawals")]
-        public async Task<ActionResult<AccountModel>> PostWithdrawFunds(Guid id, [FromBody] GetAmountRequest request)
+        public async Task<ActionResult<Account>> PostWithdrawFunds(Guid id, [FromBody] GetAmount request)
         {
             try
             {
@@ -125,7 +125,7 @@ namespace SimpleBankAPI.Controllers
         /// <param name="request">Sender's account ID: "SenderId", Recipient's account ID: "RecipientId", and decimal "Amount" to be transferred</param>
         /// <returns>The account details of both the sender and the recipient following the transfer</returns>
         [HttpPost("transfers")]
-        public async Task<ActionResult<TransferResponseModel>> PostTransferFunds([FromBody] TransferFundsRequest request)
+        public async Task<ActionResult<Transfer>> PostTransferFunds([FromBody] TransferFunds request)
         {
             try
             {

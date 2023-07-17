@@ -1,12 +1,13 @@
-using SimpleBankAPI.Models;
+using SimpleBankAPI.Models.Responses;
+using Account = SimpleBankAPI.Models.Entities.Account;
 
 namespace SimpleBankAPI.Interfaces;
 
 public interface IAccountServices
 {
-    Task<AccountModel> CreateAccount(string name);
-    ValueTask<AccountModel?> FindAccount(Guid id);
-    Task<AccountModel?> DepositFunds(Guid id, decimal amount);
-    Task<AccountModel?> WithdrawFunds(Guid id, decimal amount);
-    Task<TransferResponseModel> TransferFunds(Guid senderId, Guid recipientId, decimal amount);
+    Task<Account> CreateAccount(string name);
+    ValueTask<Account?> FindAccount(Guid id);
+    Task<Account?> DepositFunds(Guid id, decimal amount);
+    Task<Account?> WithdrawFunds(Guid id, decimal amount);
+    Task<Transfer> TransferFunds(Guid senderId, Guid recipientId, decimal amount);
 }

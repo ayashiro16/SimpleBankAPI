@@ -1,6 +1,6 @@
-namespace SimpleBankAPI.Models;
+namespace SimpleBankAPI.Models.Entities;
 
-public class AccountModel
+public class Account
 {
     public Guid Id { get; init; }
     public string Name { get; init; }
