@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using SimpleBankAPI.Models;
-using SimpleBankAPI.Interfaces;
 using SimpleBankAPI.Requests;
+using IAccountServices = SimpleBankAPI.Interfaces.IAccountServices;
 
 namespace SimpleBankAPI.Controllers
 {
@@ -9,12 +9,10 @@ namespace SimpleBankAPI.Controllers
     [ApiController]
     public class AccountController : ControllerBase
     {
-        private readonly ISavableCollection _context;
         private readonly IAccountServices _account;
         
-        public AccountController(ISavableCollection context, IAccountServices account)
+        public AccountController(IAccountServices account)
         {
-            _context = context;
             _account = account;
         }
         
@@ -26,7 +24,7 @@ namespace SimpleBankAPI.Controllers
         [HttpGet("{id:Guid}")]
         public async Task<ActionResult<AccountModel>> GetAccount(Guid id)
         {
-            var account = await _context.FindAsync(id);
+            var account = await _account.FindAccount(id);
             if (account is null)
             {
                 return NotFound();
